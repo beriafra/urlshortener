@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<body>
+
+<div th:if="${errorMessage == null}">
+  <div style="background-color: #4CAF50; color: white; padding: 10px;">
+    <h2>URL Shortening Successful</h2>
+  </div>
+
+  <h2>Original URL</h2>
+  <p th:text="${originalUrl}"></p>
+
+  <h2>Shortened URL</h2>
+  <p th:text="${shortUrl}"></p>
+</div>
+<!-- This will only show if there is an error message -->
+<div th:if="${errorMessage}" style="background-color: #f44336; color: white; padding: 10px;">
+  <h2>Error</h2>
+  <p th:text="${errorMessage}"></p>
+</div>
+
+</body>
+</html>
