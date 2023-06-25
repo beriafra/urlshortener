@@ -12,6 +12,7 @@ public interface UrlService {
     public Url generateShortLinkWithUser(UrlDto urlDto, String userName);
     public Url persistShortLink(Url url);
     public Url getEncodedUrl(String url);
+    public String decodeUrl(String url);
     public List<Url> getAllUrlsForUser(String userId);
     public  void  deleteShortLink(Url url);
     public void enableUrl(String shortLink, String userId);

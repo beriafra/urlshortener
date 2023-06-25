@@ -24,23 +24,6 @@ public class UrlShortenerController {
         this.urlService = urlService;
     }
 
-    @PostMapping("/generate")
-    public ResponseEntity<?> generateShortLink(@RequestBody UrlDto urlDto, Authentication authentication) {
-        Url urlToRet = urlService.generateShortLinkWithUser(urlDto, authentication.getName());
-
-        if(urlToRet != null) {
-            UrlResponseDto urlResponseDto = new UrlResponseDto();
-            urlResponseDto.setOriginalUrl(urlToRet.getOriginalUrl());
-            urlResponseDto.setExpirationDate(urlToRet.getExpirationDate());
-            urlResponseDto.setShortLink(urlToRet.getShortLink());
-            return new ResponseEntity<>(urlResponseDto, HttpStatus.OK);
-        }
-
-        UrlErrorResponseDto urlErrorResponseDto = new UrlErrorResponseDto();
-        urlErrorResponseDto.setStatus("500");
-        urlErrorResponseDto.setError("There was an error processing your request. please try again.");
-        return new ResponseEntity<>(urlErrorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     @GetMapping("/{shortLink}")
     public ResponseEntity<?> redirectToOriginalUrl(@PathVariable String shortLink, HttpServletResponse response) throws IOException {
@@ -70,6 +53,7 @@ public class UrlShortenerController {
         urlService.persistShortLink(encodedUrl);
 
         response.sendRedirect(encodedUrl.getOriginalUrl());
+       // response.sendRedirect(urlService.decodeUrl(encodedUrl.getShortLink()));
         return null;
     }
 
@@ -98,4 +82,5 @@ public class UrlShortenerController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

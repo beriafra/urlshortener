@@ -3,21 +3,22 @@ package com.afra.urlshortener.service;
 import com.afra.urlshortener.model.Url;
 import com.afra.urlshortener.model.UrlDto;
 import com.afra.urlshortener.repository.UrlRepository;
+import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class
 UrlServiceImpl implements UrlService {
 
     private static final Logger logger = LoggerFactory.getLogger(UrlServiceImpl.class);
-    private final AtomicLong counter = new AtomicLong(0);
-
     private final UrlRepository urlRepository;
 
     public UrlServiceImpl(UrlRepository urlRepository) {
@@ -56,7 +57,13 @@ UrlServiceImpl implements UrlService {
     public Url getEncodedUrl(String url) {
         return urlRepository.findByShortLink(url);
     }
+    @Override
+    public String decodeUrl(String url)
+    {
+        byte[] decodedURLBytes = Base64.getUrlDecoder().decode(url);
 
+        return new String(decodedURLBytes);
+    }
     @Override
     public void deleteShortLink(Url url) {
 
@@ -106,7 +113,12 @@ UrlServiceImpl implements UrlService {
 
     private String encodeUrl(String url)
     {
-        return Base62UrlEncoder.encode(counter.incrementAndGet());
+        String encodedUrl = "";
+        LocalDateTime time = LocalDateTime.now();
+        encodedUrl = Hashing.murmur3_32_fixed()
+                .hashString(url.concat(time.toString()), StandardCharsets.UTF_8)
+                .toString();
+        return  encodedUrl;
     }
 
 }

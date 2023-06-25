@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
-<body>
-
 <header>
     <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/urls">All URLs</a></li>
+        <ul style="list-style-type: none; margin: 0; padding: 0; overflow: hidden; padding-bottom: 24px">
+            <li style="float: left; margin-right: 10px;"><a href="/">Home</a></li>
+            <li style="float: left; margin-right: 10px;"><a href="/urls">All URLs</a></li>
+            <li th:if="${username != null}" style="float: left;"><span>UserId: <span th:text="${username}"></span></span></li>
         </ul>
     </nav>
 </header>
-
-</body>
 </html>

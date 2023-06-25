@@ -10,10 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 public class WebController {
@@ -25,15 +22,18 @@ public class WebController {
 
 
     @GetMapping("/")
-    public String shortenUrl(Model model) {
+    public String shortenUrl(Model model, Authentication authentication) {
         model.addAttribute("urlDto", new UrlDto());
+        if(authentication != null){
+            model.addAttribute("username", authentication.getName());
+        }
         return "shortenUrl";
     }
 
-    @PostMapping("/generateShortLink")
+    @PostMapping("/result")
     public String generateShortLink(@Valid @ModelAttribute UrlDto urlDto, BindingResult result, Model model, Authentication authentication) {
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
+            model.addAttribute("errorMessage", result.getFieldError().getDefaultMessage());
             return "result";
         }
         Url urlToRet = urlService.generateShortLinkWithUser(urlDto, authentication.getName());
@@ -44,10 +44,11 @@ public class WebController {
 
     @GetMapping("/urls")
     public ModelAndView getAllUrlsForCurrentUser(Authentication authentication) {
-        String userId = authentication.getName();
+        String userId = authentication.getName(); // Get the authenticated user's ID
         List<Url> urls = urlService.getAllUrlsForUser(userId);
-        ModelAndView modelAndView = new ModelAndView("urls");
+        ModelAndView modelAndView = new ModelAndView("urls"); // The name of your Thymeleaf template
         modelAndView.addObject("urls", urls);
+        modelAndView.addObject("username", userId);
         return modelAndView;
     }
 

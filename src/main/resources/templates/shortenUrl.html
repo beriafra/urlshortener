@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:include="component/header :: header"></div>
 <body>
 
-<form action="#" th:action="@{/generateShortLink}" th:object="${urlDto}" method="post">
+<form action="#" th:action="@{/result}" th:object="${urlDto}" method="post">
   <input type="text" th:field="*{url}" placeholder="Enter URL">
   <button type="submit">Generate</button>
 </form>
