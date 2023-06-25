@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class UrlServiceImpl implements UrlService {
+public class
+UrlServiceImpl implements UrlService {
 
     private static final Logger logger = LoggerFactory.getLogger(UrlServiceImpl.class);
     private final AtomicLong counter = new AtomicLong(0);
