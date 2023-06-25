@@ -1,23 +1,13 @@
 package com.afra.urlshortener.model;
 
 public class UrlErrorResponseDto {
-    private String status;
     private String error;
 
-    public UrlErrorResponseDto(String status, String error) {
-        this.status = status;
+    public UrlErrorResponseDto(String error) {
         this.error = error;
     }
 
     public UrlErrorResponseDto() {
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getError() {
@@ -31,8 +21,7 @@ public class UrlErrorResponseDto {
     @Override
     public String toString() {
         return "UrlErrorResponseDto{" +
-                "status='" + status + '\'' +
-                ", error='" + error + '\'' +
+                "error='" + error + '\'' +
                 '}';
     }
 }

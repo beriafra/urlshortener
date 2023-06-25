@@ -24,17 +24,19 @@ public class UrlShortenerController {
         this.urlService = urlService;
     }
 
-
     @GetMapping("/{shortLink}")
     public ResponseEntity<?> redirectToOriginalUrl(@PathVariable String shortLink, HttpServletResponse response) throws IOException {
         if(StringUtils.isEmpty(shortLink)) {
-            UrlErrorResponseDto urlErrorResponseDto = new UrlErrorResponseDto();
-            urlErrorResponseDto.setError("Invalid Url");
-            urlErrorResponseDto.setStatus("400");
+            UrlErrorResponseDto urlErrorResponseDto = new UrlErrorResponseDto("Invalid Url");
             return new ResponseEntity<>(urlErrorResponseDto, HttpStatus.BAD_REQUEST);
+
         }
 
         Url encodedUrl = urlService.getEncodedUrl(shortLink);
+
+        if(encodedUrl == null){
+            return new ResponseEntity<>("The provided short URL does not exist!", HttpStatus.NOT_FOUND);
+        }
 
         if(!encodedUrl.getEnabled()){
             return new ResponseEntity<>("This url has been disabled by owner!", HttpStatus.FORBIDDEN);
@@ -42,9 +44,7 @@ public class UrlShortenerController {
 
         if(encodedUrl.getExpirationDate().isBefore(LocalDateTime.now())) {
             urlService.deleteShortLink(encodedUrl);
-            UrlErrorResponseDto urlErrorResponseDto = new UrlErrorResponseDto();
-            urlErrorResponseDto.setError("Url Expired. Please try generating a fresh one.");
-            urlErrorResponseDto.setStatus("410");
+            UrlErrorResponseDto urlErrorResponseDto = new UrlErrorResponseDto("Url Expired. Please try generating a fresh one.");
             return new ResponseEntity<>(urlErrorResponseDto, HttpStatus.GONE);
         }
 
@@ -53,34 +53,32 @@ public class UrlShortenerController {
         urlService.persistShortLink(encodedUrl);
 
         response.sendRedirect(encodedUrl.getOriginalUrl());
-       // response.sendRedirect(urlService.decodeUrl(encodedUrl.getShortLink()));
-        return null;
+        return ResponseEntity.status(HttpStatus.FOUND).build(); // 302 - Found, used for redirection
     }
 
     @GetMapping("/users/urls")
-    public ResponseEntity<?> getAllUrlsForUser(Authentication authentication) {
+    public ResponseEntity<List<Url>> getAllUrlsForUser(Authentication authentication) {
         List<Url> urls = urlService.getAllUrlsForUser(authentication.getName());
-        return new ResponseEntity<>(urls, HttpStatus.OK);
+        return ResponseEntity.ok(urls); // 200 - OK
     }
 
     @PutMapping("/enable/{shortLink}")
-    public ResponseEntity<?> enableUrl(@PathVariable String shortLink, Authentication authentication) {
+    public ResponseEntity<String> enableUrl(@PathVariable String shortLink, Authentication authentication) {
         try {
             urlService.enableUrl(shortLink, authentication.getName());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.noContent().build(); // 204 - No Content
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 - Internal Server Error
         }
     }
 
     @PutMapping("/disable/{shortLink}")
-    public ResponseEntity<?> disableUrl(@PathVariable String shortLink, Authentication authentication) {
+    public ResponseEntity<String> disableUrl(@PathVariable String shortLink, Authentication authentication) {
         try {
             urlService.disableUrl(shortLink, authentication.getName());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.noContent().build(); // 204 - No Content
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 - Internal Server Error
         }
     }
-
 }
