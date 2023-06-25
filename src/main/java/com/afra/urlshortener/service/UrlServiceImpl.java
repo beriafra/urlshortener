@@ -3,20 +3,19 @@ package com.afra.urlshortener.service;
 import com.afra.urlshortener.model.Url;
 import com.afra.urlshortener.model.UrlDto;
 import com.afra.urlshortener.repository.UrlRepository;
-import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class UrlServiceImpl implements UrlService {
 
     private static final Logger logger = LoggerFactory.getLogger(UrlServiceImpl.class);
+    private final AtomicLong counter = new AtomicLong(0);
 
     private final UrlRepository urlRepository;
 
@@ -106,12 +105,7 @@ public class UrlServiceImpl implements UrlService {
 
     private String encodeUrl(String url)
     {
-        String encodedUrl = "";
-        LocalDateTime time = LocalDateTime.now();
-        encodedUrl = Hashing.murmur3_32_fixed()
-                .hashString(url.concat(time.toString()), StandardCharsets.UTF_8)
-                .toString();
-        return  encodedUrl;
+        return Base62UrlEncoder.encode(counter.incrementAndGet());
     }
 
 }

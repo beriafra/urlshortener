@@ -60,7 +60,7 @@ public class WebController {
 
     @PostMapping("/enable/{shortLink}")
     public String enableUrl(@PathVariable String shortLink, Authentication authentication) {
-        String userId = authentication.getName(); // Get the authenticated user's ID
+        String userId = authentication.getName();
         urlService.enableUrl(shortLink, userId);
         return "redirect:/urls";
     }
